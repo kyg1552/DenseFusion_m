@@ -1,0 +1,37 @@
+<launch>
+
+  <arg name="gpu" default="0" />
+  <arg name="gui" default="true" />
+  <!-- <include file="$(find dense_fusion_ros)/sample/include/play_rosbag_ycb_video.xml" /> -->
+
+  <node name="dense_fusion_node"
+        pkg="dense_fusion_ros" type="dense_fusion_node.py" >
+    <remap from="~input/image" to="/humic/camera/color/image_raw" />
+    <remap from="~input/label" to="/label" />
+    <remap from="~input/depth" to="/humic/camera/depth/image_raw" />
+    <remap from="~input/rects" to="/rects" />
+    <remap from="~input/class" to="/class_results" />
+    <remap from="~input/info" to="/humic/camera/color/camera_info" />
+    <rosparam subst_value="true" >
+      mesh_model_path: $(find dense_fusion_ros)/sample/data/ycb_video_dataset_mesh_models
+      target_label: 025_mug
+      queue_size: 5
+      <!-- 002_master_chef_can -->
+      <!-- 025_mug -->
+      <!-- 007_tuna_fish_can -->
+    </rosparam>
+  </node>
+
+  <node name="draw_rects"
+          pkg="jsk_perception" type="draw_rects">
+        <remap from="~input" to="/camera/rgb/image_rect_color" />
+        <remap from="~input/rects" to="/rects" />
+        <remap from="~input/class" to="/class_results" />
+        <rosparam>
+            use_classification_result: true
+            show_proba: false
+        </rosparam>
+    </node>
+
+
+</launch>
